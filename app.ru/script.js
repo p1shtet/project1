@@ -4,9 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const temp3Element = document.getElementById('temp3');
     const refreshButton = document.getElementById('refreshButton');
 
-    // Функция для запроса данных с сервера
     function fetchTemperatures() {
-        fetch('http://ваш_сервер_ip:5000/get_temperatures') // Замените на IP вашего сервера
+        fetch('http://192.168.88.235:5000/get_temperatures')
             .then(response => {
                  if (!response.ok) {
                       throw new Error(`HTTP error! status: ${response.status}`);
