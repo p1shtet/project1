@@ -4,25 +4,42 @@ document.addEventListener('DOMContentLoaded', function() {
     const temp3Element = document.getElementById('temp3');
     const refreshButton = document.getElementById('refreshButton');
 
-    function fetchTemperatures() {
-        fetch('http://192.168.88.235:5000/get_temperatures')
-            .then(response => {
-                 if (!response.ok) {
-                      throw new Error(`HTTP error! status: ${response.status}`);
+    const sensorIP = 'http://192.168.88.235:5000'; // Базовый URL датчика (без эндпоинта)
+
+    async function fetchTemperatures() {
+      try {
+           // Отправляем запросы к каждому сенсору отдельно.
+          const [temp1, temp2, temp3] = await Promise.all([
+            fetch(`${sensorIP}/sensor1`).then(res => {
+                 if (!res.ok) {
+                      throw new Error(`HTTP error! status: ${res.status}`);
                   }
-                return response.json();
-            })
-            .then(data => {
-                temp1Element.textContent = data.sensor1 + ' °C';
-                temp2Element.textContent = data.sensor2 + ' °C';
-                temp3Element.textContent = data.sensor3 + ' °C';
-            })
-             .catch(error => {
-                console.error('Ошибка при получении данных:', error);
-                  temp1Element.textContent = 'Ошибка';
-                  temp2Element.textContent = 'Ошибка';
-                  temp3Element.textContent = 'Ошибка';
-            });
+                  return res.text()
+            }),
+            fetch(`${sensorIP}/sensor2`).then(res => {
+              if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                 return res.text()
+             }),
+            fetch(`${sensorIP}/sensor3`).then(res => {
+              if (!res.ok) {
+                   throw new Error(`HTTP error! status: ${res.status}`);
+                 }
+                  return res.text()
+             })
+          ]);
+
+         temp1Element.textContent = temp1 + ' °C';
+         temp2Element.textContent = temp2 + ' °C';
+         temp3Element.textContent = temp3 + ' °C';
+      }
+       catch (error) {
+           console.error('Ошибка при получении данных:', error);
+            temp1Element.textContent = 'Ошибка';
+            temp2Element.textContent = 'Ошибка';
+            temp3Element.textContent = 'Ошибка';
+       }
     }
 
     fetchTemperatures();
